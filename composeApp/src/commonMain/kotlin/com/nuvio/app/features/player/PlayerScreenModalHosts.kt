@@ -77,6 +77,10 @@ internal fun PlayerScreenModalHosts(
     onBackToEpisodes: () -> Unit,
     onReloadEpisodeStreams: () -> Unit,
     onEpisodesPanelDismissed: () -> Unit,
+    showChaptersPanel: Boolean,
+    chapters: List<PlayerChapter>,
+    onChapterSelected: (PlayerChapter) -> Unit,
+    onChaptersPanelDismissed: () -> Unit,
     showSubmitIntroModal: Boolean,
     activeVideoId: String?,
     metaUiState: MetaDetailsUiState,
@@ -196,6 +200,14 @@ internal fun PlayerScreenModalHosts(
             onDismiss = onEpisodesPanelDismissed,
         )
     }
+
+    PlayerChaptersPanel(
+        visible = showChaptersPanel,
+        chapters = chapters,
+        positionMs = displayedPositionMs,
+        onChapterSelected = onChapterSelected,
+        onDismiss = onChaptersPanelDismissed,
+    )
 
     val season = activeSeasonNumber
     val episode = activeEpisodeNumber
