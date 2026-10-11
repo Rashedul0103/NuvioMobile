@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
@@ -53,10 +52,12 @@ import nuvio.composeapp.generated.resources.community_membership_you_are
 import nuvio.composeapp.generated.resources.community_view_supporter_membership
 import org.jetbrains.compose.resources.stringResource
 
-private val CardColor = Color(0xFF07080B)
-private val PrimaryTextColor = Color(0xFFF6F7F9)
-private val SecondaryTextColor = Color.White.copy(alpha = 0.65f)
-private val TertiaryTextColor = Color.White.copy(alpha = 0.52f)
+private val PrimaryTextColor: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurface
+private val SecondaryTextColor: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+private val TertiaryTextColor: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f)
 
 @Composable
 internal fun SupporterMembershipCard(
@@ -71,7 +72,7 @@ internal fun SupporterMembershipCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(CardColor),
+            .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
         when {
             state.isLoading -> LoadingMembershipContent(isTablet = isTablet)
@@ -482,7 +483,7 @@ private fun MembershipStatusError(visible: Boolean) {
     Text(
         text = stringResource(Res.string.community_membership_unable_load),
         style = MaterialTheme.typography.bodySmall,
-        color = Color(0xFFFF9E9E),
+        color = MaterialTheme.colorScheme.error,
     )
 }
 
@@ -497,8 +498,8 @@ private fun MembershipButton(
         enabled = enabled,
         modifier = Modifier.heightIn(min = 44.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryTextColor,
-            contentColor = CardColor,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
     ) {
