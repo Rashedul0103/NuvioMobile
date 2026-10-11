@@ -153,7 +153,7 @@ fun NuvioNavigationBar(
                     Modifier
                 },
             )
-            .background(Color(0xFF1C1C1E).copy(alpha = if (hazeState != null) 0.55f else 0.82f))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = if (hazeState != null) 0.55f else 0.82f))
 
         Box(modifier = pillModifier) {
             Row(
