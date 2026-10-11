@@ -160,6 +160,8 @@ internal class PlayerScreenRuntime(
 
     var showSourcesPanel by mutableStateOf(false)
     var showEpisodesPanel by mutableStateOf(false)
+    var showChaptersPanel by mutableStateOf(false)
+    var chapters by mutableStateOf<List<PlayerChapter>>(emptyList())
     var showSubmitIntroModal by mutableStateOf(false)
     var submitIntroSegmentType by mutableStateOf("intro")
     var submitIntroStartTimeStr by mutableStateOf("00:00")
