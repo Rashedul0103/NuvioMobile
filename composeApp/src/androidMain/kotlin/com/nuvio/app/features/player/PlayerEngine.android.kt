@@ -811,6 +811,9 @@ private fun ExoPlayerSurface(
                 override fun getAudioTracks(): List<AudioTrack> =
                     exoPlayer.extractAudioTracks(context)
 
+                override suspend fun getChapters(): List<PlayerChapter> =
+                    runCatching { exoPlayer.id3Chapters() }.getOrDefault(emptyList())
+
                 override suspend fun getMediaInfo(): PlayerMediaInfo {
                     val video = exoPlayer.videoFormat
                     val audio = exoPlayer.audioFormat
@@ -1482,6 +1485,17 @@ private class NuvioLibmpvView(
         }
     }
 
+    suspend fun chapters(): List<PlayerChapter> {
+        if (released.get()) return emptyList()
+        return withContext(mpvDispatcher) {
+            if (released.get()) {
+                emptyList()
+            } else {
+                runCatching { mpvChapters(mpv::getPropertyString) }.getOrDefault(emptyList())
+            }
+        }
+    }
+
     private fun readSnapshotNow(): PlayerPlaybackSnapshot {
         val paused = mpv.getPropertyBoolean("pause") ?: true
         val pausedForCache = mpv.getPropertyBoolean("paused-for-cache") ?: false
@@ -1559,6 +1573,8 @@ private class NuvioLibmpvView(
             }
 
             override suspend fun getMediaInfo(): PlayerMediaInfo = mediaInfo()
+
+            override suspend fun getChapters(): List<PlayerChapter> = chapters()
 
             override fun setPlaybackSpeed(speed: Float) {
                 executeMpv {
