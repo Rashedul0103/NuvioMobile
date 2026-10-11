@@ -1151,54 +1151,53 @@ private fun Modifier.authGradientBackground(largeScreen: Boolean): Modifier {
     val midSurface = lerp(focusSurface, elevatedSurface, 0.36f)
     val lowerSurface = lerp(elevatedSurface, background, 0.42f)
     return drawWithCache {
-    val angleDegrees = if (largeScreen) 122.0 else 148.0
-    val angleRadians = angleDegrees * PI / 180.0
-    val directionX = sin(angleRadians).toFloat()
-    val directionY = (-cos(angleRadians)).toFloat()
-    val halfLength = (abs(size.width * directionX) + abs(size.height * directionY)) / 2f
-    val center = Offset(size.width / 2f, size.height / 2f)
-    val start = Offset(
-        x = center.x - directionX * halfLength,
-        y = center.y - directionY * halfLength,
-    )
-    val end = Offset(
-        x = center.x + directionX * halfLength,
-        y = center.y + directionY * halfLength,
-    )
-    val colorStops = if (largeScreen) {
-        arrayOf(
-            0f to focusSurface,
-            0.14f to focusSurface,
-            0.26f to midSurface,
-            0.36f to lowerSurface,
-            0.48f to lowerSurface,
-            0.60f to background,
-            0.70f to background,
-            1f to background,
+        val angleDegrees = if (largeScreen) 122.0 else 148.0
+        val angleRadians = angleDegrees * PI / 180.0
+        val directionX = sin(angleRadians).toFloat()
+        val directionY = (-cos(angleRadians)).toFloat()
+        val halfLength = (abs(size.width * directionX) + abs(size.height * directionY)) / 2f
+        val center = Offset(size.width / 2f, size.height / 2f)
+        val start = Offset(
+            x = center.x - directionX * halfLength,
+            y = center.y - directionY * halfLength,
         )
-    } else {
-        arrayOf(
-            0f to focusSurface,
-            0.12f to focusSurface,
-            0.24f to midSurface,
-            0.34f to lowerSurface,
-            0.44f to lowerSurface,
-            0.58f to background,
-            0.64f to background,
-            1f to background,
+        val end = Offset(
+            x = center.x + directionX * halfLength,
+            y = center.y + directionY * halfLength,
         )
-    }
-    val brush = Brush.linearGradient(
-        colorStops = colorStops,
-        start = start,
-        end = end,
-    )
+        val colorStops = if (largeScreen) {
+            arrayOf(
+                0f to focusSurface,
+                0.14f to focusSurface,
+                0.26f to midSurface,
+                0.36f to lowerSurface,
+                0.48f to lowerSurface,
+                0.60f to background,
+                0.70f to background,
+                1f to background,
+            )
+        } else {
+            arrayOf(
+                0f to focusSurface,
+                0.12f to focusSurface,
+                0.24f to midSurface,
+                0.34f to lowerSurface,
+                0.44f to lowerSurface,
+                0.58f to background,
+                0.64f to background,
+                1f to background,
+            )
+        }
+        val brush = Brush.linearGradient(
+            colorStops = colorStops,
+            start = start,
+            end = end,
+        )
         onDrawBehind {
             drawRect(brush = brush)
         }
     }
 }
-
 private fun LayoutCoordinates.boundsInRoot(): Rect {
     val position = positionInRoot()
     return Rect(
