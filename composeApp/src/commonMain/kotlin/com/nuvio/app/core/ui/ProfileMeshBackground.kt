@@ -24,7 +24,7 @@ fun ProfileMeshBackground(
         animationSpec = tween(durationMillis = 520),
         label = "profileMeshBackgroundColor",
     )
-    val baseColor = Color.Black
+    val baseColor = MaterialTheme.colorScheme.background
     val primaryMeshColor = lerp(baseColor, animatedProfileColor, 0.58f)
     val secondaryMeshColor = lerp(animatedProfileColor, MaterialTheme.colorScheme.secondary, 0.32f)
     val tertiaryMeshColor = lerp(animatedProfileColor, MaterialTheme.colorScheme.tertiary, 0.28f)
