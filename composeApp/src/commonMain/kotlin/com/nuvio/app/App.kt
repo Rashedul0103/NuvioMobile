@@ -99,7 +99,14 @@ internal fun AppEnvironment(content: @Composable () -> Unit) {
 
     val customThemeColors by ThemeSettingsRepository.customThemeColors.collectAsStateWithLifecycle()
 
-    NuvioTheme(appTheme = selectedTheme, amoled = amoledEnabled, customThemeColors = customThemeColors) {
+    // TODO(material3-redesign): switch to a user-facing / system light-dark mode once shared components
+    // stop hard-coding dark-theme colors (stages 3-4). Until then the app stays dark as before.
+    NuvioTheme(
+        darkTheme = true,
+        appTheme = selectedTheme,
+        amoled = amoledEnabled,
+        customThemeColors = customThemeColors,
+    ) {
         content()
     }
 }

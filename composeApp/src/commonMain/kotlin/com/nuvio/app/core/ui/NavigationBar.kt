@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -139,6 +140,9 @@ fun NuvioNavigationBar(
             .padding(contentPadding),
         contentAlignment = Alignment.BottomCenter,
     ) {
+        // Neutral surface that follows light/dark (≈ #1C1C1E in dark, soft gray in light).
+        val pillScheme = MaterialTheme.colorScheme
+        val pillColor = lerp(pillScheme.background, pillScheme.onSurface, 0.08f)
         // The floating pill
         val pillModifier = Modifier
             .padding(horizontal = horizontalPadding)
@@ -153,7 +157,7 @@ fun NuvioNavigationBar(
                     Modifier
                 },
             )
-            .background(Color(0xFF1C1C1E).copy(alpha = if (hazeState != null) 0.55f else 0.82f))
+            .background(pillColor.copy(alpha = if (hazeState != null) 0.55f else 0.82f))
 
         Box(modifier = pillModifier) {
             Row(
@@ -225,7 +229,6 @@ private class NuvioNavigationBarScopeImpl(
         label: String?,
     ) {
         val tokens = MaterialTheme.nuvio
-        val palette = MaterialTheme.themePalette
         val iconColor by animateColorAsState(
             targetValue = if (selected) tokens.colors.accent else tokens.colors.textMuted,
             label = "nav_icon_color",
@@ -255,7 +258,7 @@ private class NuvioNavigationBarScopeImpl(
                 Icon(
                     modifier = Modifier
                         .size(iconSize)
-                        .then(if (selected) Modifier.gradientMask(palette.accentBrush()) else Modifier),
+                        .then(if (selected) Modifier.gradientMask(tokens.colors.accentBrush()) else Modifier),
                     imageVector = icon,
                     contentDescription = contentDescription,
                     tint = if (selected) Color.White else iconColor,
@@ -275,7 +278,6 @@ private class NuvioNavigationBarScopeImpl(
         label: String?,
     ) {
         val tokens = MaterialTheme.nuvio
-        val palette = MaterialTheme.themePalette
         val iconColor by animateColorAsState(
             targetValue = if (selected) tokens.colors.accent else tokens.colors.textMuted,
             label = "nav_icon_color",
@@ -304,7 +306,7 @@ private class NuvioNavigationBarScopeImpl(
                 Icon(
                     modifier = Modifier
                         .size(iconSize)
-                        .then(if (selected) Modifier.gradientMask(palette.accentBrush()) else Modifier),
+                        .then(if (selected) Modifier.gradientMask(tokens.colors.accentBrush()) else Modifier),
                     painter = painterResource(icon),
                     contentDescription = contentDescription,
                     tint = if (selected) Color.White else iconColor,
@@ -430,7 +432,6 @@ private class NuvioClassicNavigationBarScopeImpl(
         label: String?,
     ) {
         val tokens = MaterialTheme.nuvio
-        val palette = MaterialTheme.themePalette
         val iconColor by animateColorAsState(
             targetValue = if (selected) tokens.colors.accent else tokens.colors.textMuted,
             label = "classic_nav_icon_color",
@@ -450,7 +451,7 @@ private class NuvioClassicNavigationBarScopeImpl(
                     )
                     .padding(NuvioTokens.Space.s10)
                     .size(tokens.components.navIconSize)
-                    .then(if (selected) Modifier.gradientMask(palette.accentBrush()) else Modifier),
+                    .then(if (selected) Modifier.gradientMask(tokens.colors.accentBrush()) else Modifier),
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = if (selected) Color.White else iconColor,
@@ -468,7 +469,6 @@ private class NuvioClassicNavigationBarScopeImpl(
         label: String?,
     ) {
         val tokens = MaterialTheme.nuvio
-        val palette = MaterialTheme.themePalette
         val iconColor by animateColorAsState(
             targetValue = if (selected) tokens.colors.accent else tokens.colors.textMuted,
             label = "classic_nav_icon_color",
@@ -488,7 +488,7 @@ private class NuvioClassicNavigationBarScopeImpl(
                     )
                     .padding(NuvioTokens.Space.s10)
                     .size(tokens.components.navIconSize)
-                    .then(if (selected) Modifier.gradientMask(palette.accentBrush()) else Modifier),
+                    .then(if (selected) Modifier.gradientMask(tokens.colors.accentBrush()) else Modifier),
                 painter = painterResource(icon),
                 contentDescription = contentDescription,
                 tint = if (selected) Color.White else iconColor,
