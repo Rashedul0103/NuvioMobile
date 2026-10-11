@@ -34,6 +34,7 @@ interface PlayerEngineController {
     fun updateNowPlayingMetadata(info: PlayerNowPlayingInfo) {}
     fun clearNowPlayingInfo() {}
     suspend fun getMediaInfo(): PlayerMediaInfo = PlayerMediaInfo()
+    suspend fun getChapters(): List<PlayerChapter> = emptyList()
 }
 
 internal fun sanitizePlaybackHeaders(headers: Map<String, String>?): Map<String, String> {
