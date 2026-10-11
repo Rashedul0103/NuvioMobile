@@ -371,15 +371,15 @@ internal fun defaultNuvioThemeTokens(
     colorScheme: ColorScheme?,
 ): NuvioThemeTokens {
     val background = if (amoled) Color.Black else palette.background
-    val textPrimary = Color(0xFFF5F7F8)
-    val textSecondary = Color(0xFFB8BEC5)
-    val textMuted = Color(0xFF969CA3)
+    val textPrimary = Color(0xFFE6E1E5)
+    val textSecondary = Color(0xFFCAC4D0)
+    val textMuted = Color(0xFF938F99)
     val surface = palette.backgroundElevated
     val surfaceCard = palette.backgroundCard
     val accent = palette.secondary
     val accentStrong = palette.secondaryVariant
-    val borderSubtle = Color(0xFF252A2A).copy(alpha = 0.55f)
-    val borderDefault = Color(0xFF252A2A)
+    val borderSubtle = Color(0xFF49454F).copy(alpha = 0.55f)
+    val borderDefault = Color(0xFF49454F)
     val overlayScrim = Color.Black.copy(alpha = NuvioTokens.Opacity.overlayMedium)
 
     return NuvioThemeTokens(
@@ -405,7 +405,7 @@ internal fun defaultNuvioThemeTokens(
             focusBackground = palette.focusBackground,
             borderSubtle = borderSubtle,
             borderDefault = borderDefault,
-            borderStrong = Color(0xFF3A4040),
+            borderStrong = Color(0xFF625D68),
             borderFocus = palette.focusRing,
             borderSelected = accent.copy(alpha = NuvioTokens.Opacity.strong),
             success = Color(0xFF66BB6A),
