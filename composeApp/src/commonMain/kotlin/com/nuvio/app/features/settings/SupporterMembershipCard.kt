@@ -301,7 +301,7 @@ private fun GrantMembershipContent(
         }
         MembershipStatusError(visible = hasError)
     }
-    HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f))
     MembershipFooterActions(
         showAction = showAction,
         actionEnabled = actionEnabled,
