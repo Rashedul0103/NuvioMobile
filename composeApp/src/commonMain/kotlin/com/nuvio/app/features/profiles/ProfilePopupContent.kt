@@ -112,9 +112,9 @@ internal fun ProfilePopupContent(
                         if (hazeState != null) {
                             Modifier.hazeEffect(hazeState) {
                                 blurRadius = 24.dp
-                                backgroundColor = Color(0xFF1C1C1E)
-                                tints = listOf(HazeTint(Color(0xFF1C1C1E).copy(alpha = 0.55f)))
-                                fallbackTint = HazeTint(Color(0xFF1C1C1E).copy(alpha = 0.94f))
+                                backgroundColor = tokens.colors.surfaceElevated
+                                tints = listOf(HazeTint(tokens.colors.surfaceElevated.copy(alpha = 0.55f)))
+                                fallbackTint = HazeTint(tokens.colors.surfaceElevated.copy(alpha = 0.94f))
                                 noiseFactor = 0f
                             }
                         } else {
