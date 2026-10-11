@@ -63,6 +63,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -112,19 +113,30 @@ import nuvio.composeapp.generated.resources.compose_auth_terms_prefix
 import nuvio.composeapp.generated.resources.compose_auth_welcome_back
 import org.jetbrains.compose.resources.stringResource
 
-internal val AuthTextPrimary = Color(0xFFF5F7F8)
-internal val AuthTextSecondary = Color(0xFF969CA3)
-private val AuthTextMuted = Color(0xFF6E7178)
-private val AuthPrimaryButtonBackground = Color(0xFFF5F5F5)
-private val AuthPrimaryButtonText = Color(0xFF111111)
-internal val AuthFieldBackground = Color.White.copy(alpha = 0.04f)
-private val AuthFieldBackgroundMobile = Color.White.copy(alpha = 0.035f)
-internal val AuthFieldBorder = Color.White.copy(alpha = 0.08f)
-private val AuthPaneBackground = Color.White.copy(alpha = 0.022f)
-private val AuthPaneBorder = Color.White.copy(alpha = 0.07f)
-private val AuthDividerColor = Color.White.copy(alpha = 0.10f)
-private val AuthSecondaryButtonBackground = Color.White.copy(alpha = 0.05f)
-private val AuthSecondaryButtonBorder = Color.White.copy(alpha = 0.09f)
+internal val AuthTextPrimary: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurface
+internal val AuthTextSecondary: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+private val AuthTextMuted: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f)
+private val AuthPrimaryButtonBackground: Color
+    @Composable get() = MaterialTheme.colorScheme.primary
+private val AuthPrimaryButtonText: Color
+    @Composable get() = MaterialTheme.colorScheme.onPrimary
+internal val AuthFieldBackground: Color
+    @Composable get() = MaterialTheme.colorScheme.surfaceVariant
+internal val AuthFieldBorder: Color
+    @Composable get() = MaterialTheme.colorScheme.outlineVariant
+private val AuthPaneBackground: Color
+    @Composable get() = MaterialTheme.colorScheme.surface
+private val AuthPaneBorder: Color
+    @Composable get() = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.72f)
+private val AuthDividerColor: Color
+    @Composable get() = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f)
+private val AuthSecondaryButtonBackground: Color
+    @Composable get() = MaterialTheme.colorScheme.surfaceVariant
+private val AuthSecondaryButtonBorder: Color
+    @Composable get() = MaterialTheme.colorScheme.outlineVariant
 
 private data class AuthFormMetrics(
     val fieldHeight: Dp,
@@ -151,7 +163,7 @@ private val MobileAuthFormMetrics = AuthFormMetrics(
     dividerTop = 28.dp,
     secondaryTop = 24.dp,
     secondaryHeight = 54.dp,
-    fieldBackground = AuthFieldBackgroundMobile,
+    fieldBackground = Color.Transparent,
 )
 
 private val LargeAuthFormMetrics = AuthFormMetrics(
@@ -165,7 +177,7 @@ private val LargeAuthFormMetrics = AuthFormMetrics(
     dividerTop = 30.dp,
     secondaryTop = 26.dp,
     secondaryHeight = 56.dp,
-    fieldBackground = AuthFieldBackground,
+    fieldBackground = Color.Transparent,
 )
 
 private fun largeAuthScale(screenWidth: Dp): Float =
@@ -244,7 +256,7 @@ fun AuthScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
             .pointerInput(emailFieldBounds, passwordFieldBounds) {
                 awaitEachGesture {
                     val down = awaitFirstDown(
@@ -276,7 +288,7 @@ fun AuthScreen(
                     val formPaneWidth = (screenWidth * 0.30f).coerceIn(460.dp * largeScale, 720.dp * largeScale)
                     val brandHorizontalPadding = (screenWidth * 0.055f).coerceIn(56.dp * largeScale, 128.dp * largeScale)
                     val formHorizontalPadding = (formPaneWidth * 0.14f).coerceIn(48.dp, 96.dp)
-                    val formMetrics = largeAuthFormMetrics(largeScale)
+                    val formMetrics = largeAuthFormMetrics(largeScale).copy(fieldBackground = AuthFieldBackground)
 
                     AuthLargeLayout(
                         modifier = Modifier.fillMaxSize(),
@@ -482,7 +494,7 @@ private fun AuthMobileLayout(
                 authError = authError,
                 deviceLinkAuthState = deviceLinkAuthState,
                 deviceLinkEnabled = deviceLinkEnabled,
-                metrics = MobileAuthFormMetrics,
+                metrics = MobileAuthFormMetrics.copy(fieldBackground = AuthFieldBackground),
                 onEmailChange = onEmailChange,
                 onPasswordChange = onPasswordChange,
                 onPasswordVisibilityToggle = onPasswordVisibilityToggle,
@@ -1131,7 +1143,14 @@ internal fun AuthSecondaryButton(
     }
 }
 
-private fun Modifier.authGradientBackground(largeScreen: Boolean): Modifier = drawWithCache {
+@Composable
+private fun Modifier.authGradientBackground(largeScreen: Boolean): Modifier {
+    val background = MaterialTheme.colorScheme.background
+    val focusSurface = MaterialTheme.colorScheme.primaryContainer
+    val elevatedSurface = MaterialTheme.colorScheme.surfaceVariant
+    val midSurface = lerp(focusSurface, elevatedSurface, 0.36f)
+    val lowerSurface = lerp(elevatedSurface, background, 0.42f)
+    return drawWithCache {
     val angleDegrees = if (largeScreen) 122.0 else 148.0
     val angleRadians = angleDegrees * PI / 180.0
     val directionX = sin(angleRadians).toFloat()
@@ -1148,25 +1167,25 @@ private fun Modifier.authGradientBackground(largeScreen: Boolean): Modifier = dr
     )
     val colorStops = if (largeScreen) {
         arrayOf(
-            0f to Color(0xFF21113B),
-            0.14f to Color(0xFF21113B),
-            0.26f to Color(0xFF1A0E2F),
-            0.36f to Color(0xFF130A23),
-            0.48f to Color(0xFF0A060F),
-            0.60f to Color(0xFF050408),
-            0.70f to Color.Black,
-            1f to Color.Black,
+            0f to focusSurface,
+            0.14f to focusSurface,
+            0.26f to midSurface,
+            0.36f to lowerSurface,
+            0.48f to lowerSurface,
+            0.60f to background,
+            0.70f to background,
+            1f to background,
         )
     } else {
         arrayOf(
-            0f to Color(0xFF21113B),
-            0.12f to Color(0xFF21113B),
-            0.24f to Color(0xFF1A0E2F),
-            0.34f to Color(0xFF130A23),
-            0.44f to Color(0xFF0A060F),
-            0.58f to Color(0xFF050408),
-            0.64f to Color.Black,
-            1f to Color.Black,
+            0f to focusSurface,
+            0.12f to focusSurface,
+            0.24f to midSurface,
+            0.34f to lowerSurface,
+            0.44f to lowerSurface,
+            0.58f to background,
+            0.64f to background,
+            1f to background,
         )
     }
     val brush = Brush.linearGradient(
@@ -1174,8 +1193,9 @@ private fun Modifier.authGradientBackground(largeScreen: Boolean): Modifier = dr
         start = start,
         end = end,
     )
-    onDrawBehind {
-        drawRect(brush = brush)
+        onDrawBehind {
+            drawRect(brush = brush)
+        }
     }
 }
 
