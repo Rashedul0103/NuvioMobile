@@ -1,6 +1,7 @@
 package com.nuvio.app.core.ui
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 
 data class ThemeColorPalette(
     val secondary: Color,
@@ -176,19 +177,28 @@ object ThemeColors {
     fun getColorPalette(
         theme: AppTheme,
         customColors: CustomThemeColors = CustomThemeColors.Default,
-    ): ThemeColorPalette = when (theme) {
-        AppTheme.CUSTOM -> customColors.toColorPalette()
-        AppTheme.GOLD -> Gold
-        AppTheme.JADE -> Jade
-        AppTheme.ROSE_GOLD -> RoseGold
-        AppTheme.ARCTIC_BLUE -> ArcticBlue
-        AppTheme.GRAPHITE -> Graphite
-        AppTheme.CRIMSON -> Crimson
-        AppTheme.OCEAN -> Ocean
-        AppTheme.VIOLET -> Violet
-        AppTheme.EMERALD -> Emerald
-        AppTheme.AMBER -> Amber
-        AppTheme.ROSE -> Rose
-        AppTheme.WHITE -> White
+    ): ThemeColorPalette {
+        val palette = when (theme) {
+            AppTheme.CUSTOM -> customColors.toColorPalette()
+            AppTheme.GOLD -> Gold
+            AppTheme.JADE -> Jade
+            AppTheme.ROSE_GOLD -> RoseGold
+            AppTheme.ARCTIC_BLUE -> ArcticBlue
+            AppTheme.GRAPHITE -> Graphite
+            AppTheme.CRIMSON -> Crimson
+            AppTheme.OCEAN -> Ocean
+            AppTheme.VIOLET -> Violet
+            AppTheme.EMERALD -> Emerald
+            AppTheme.AMBER -> Amber
+            AppTheme.ROSE -> Rose
+            AppTheme.WHITE -> White
+        }
+
+        // Keep surfaces in a Material 3 dark tonal range while letting each theme tint them.
+        return palette.copy(
+            background = lerp(Color(0xFF141318), palette.secondary, 0.025f),
+            backgroundElevated = lerp(Color(0xFF1D1B20), palette.secondary, 0.04f),
+            backgroundCard = lerp(Color(0xFF26242A), palette.secondary, 0.055f),
+        )
     }
 }
