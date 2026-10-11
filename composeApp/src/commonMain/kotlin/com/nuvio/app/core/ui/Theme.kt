@@ -48,15 +48,23 @@ private fun buildColorScheme(palette: ThemeColorPalette, amoled: Boolean = false
     onPrimaryContainer = contentColorFor(palette.focusBackground),
     secondary = palette.secondaryVariant,
     onSecondary = palette.onSecondaryVariant,
+    tertiary = palette.focusRing,
+    onTertiary = contentColorFor(palette.focusRing),
+    tertiaryContainer = palette.focusBackground,
+    onTertiaryContainer = contentColorFor(palette.focusBackground),
     background = if (amoled) Color.Black else palette.background,
     onBackground = Color(0xFFF5F7F8),
     surface = palette.backgroundElevated,
     onSurface = Color(0xFFF5F7F8),
     surfaceVariant = palette.backgroundCard,
-    onSurfaceVariant = Color(0xFF969CA3),
-    outline = Color(0xFF252A2A),
-    error = Color(0xFFE36A8A),
-    onError = Color(0xFFFCE5EC),
+    onSurfaceVariant = Color(0xFFCAC4D0),
+    outline = Color(0xFF79747E),
+    outlineVariant = Color(0xFF49454F),
+    surfaceTint = palette.secondary,
+    error = Color(0xFFF2B8B5),
+    onError = Color(0xFF601410),
+    errorContainer = Color(0xFF8C1D18),
+    onErrorContainer = Color(0xFFF9DEDC),
 )
 
 private val JetBrainsSans: FontFamily
@@ -188,10 +196,6 @@ private val NuvioTypeTokens: NuvioTypeScale
         ),
     )
 
-private val NuvioRippleConfiguration = RippleConfiguration(
-    color = Color.Black,
-)
-
 @Composable
 fun NuvioTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -214,7 +218,7 @@ fun NuvioTheme(
         ),
         LocalNuvioThemeTokens provides tokens,
         LocalNuvioTypeScale provides NuvioTypeTokens,
-        LocalRippleConfiguration provides NuvioRippleConfiguration,
+        LocalRippleConfiguration provides RippleConfiguration(color = palette.secondary),
         LocalAppTheme provides appTheme,
         LocalThemePalette provides palette,
     ) {
