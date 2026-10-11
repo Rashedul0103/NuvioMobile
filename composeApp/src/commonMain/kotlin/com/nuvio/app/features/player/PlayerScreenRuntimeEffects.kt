@@ -39,12 +39,38 @@ import kotlinx.coroutines.launch
 import nuvio.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.getString
 
+private const val ChapterLoadAttempts = 5
+private const val ChapterLoadRetryDelayMs = 1_500L
+
 @Composable
 internal fun PlayerScreenRuntime.BindPlayerRuntimeEffects() {
     val currentFeedback = liveGestureFeedback ?: gestureFeedback
     LaunchedEffect(currentFeedback) {
         if (currentFeedback != null) {
             renderedGestureFeedback = currentFeedback
+        }
+    }
+
+    val chaptersController = playerController
+    val chaptersSourceMatches = playerControllerSourceUrl == activeSourceUrl
+    val chaptersDurationKnown = playbackSnapshot.durationMs > 0L
+    LaunchedEffect(chaptersController, activeSourceUrl, chaptersSourceMatches, chaptersDurationKnown) {
+        chapters = emptyList()
+        val controller = chaptersController ?: return@LaunchedEffect
+        if (!chaptersSourceMatches || !chaptersDurationKnown) return@LaunchedEffect
+        repeat(ChapterLoadAttempts) {
+            val loaded = try {
+                controller.getChapters()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                emptyList()
+            }
+            if (shouldShowChaptersButton(loaded)) {
+                chapters = loaded
+                return@LaunchedEffect
+            }
+            delay(ChapterLoadRetryDelayMs)
         }
     }
 
