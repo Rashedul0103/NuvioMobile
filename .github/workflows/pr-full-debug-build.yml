@@ -1,6 +1,8 @@
 name: PR Full Debug Build
 
 on:
+  push:
+    branches: [material3-ui-test-build]
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [cmp-rewrite]

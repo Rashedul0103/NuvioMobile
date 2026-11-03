@@ -8,12 +8,10 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -37,27 +35,6 @@ val MaterialTheme.appTheme: AppTheme
     @Composable
     @ReadOnlyComposable
     get() = LocalAppTheme.current
-
-private fun contentColorFor(background: Color): Color =
-    if (background.luminance() > 0.5f) Color(0xFF111111) else Color(0xFFF5F7F8)
-
-private fun buildColorScheme(palette: ThemeColorPalette, amoled: Boolean = false) = darkColorScheme(
-    primary = palette.secondary,
-    onPrimary = palette.onSecondary,
-    primaryContainer = palette.focusBackground,
-    onPrimaryContainer = contentColorFor(palette.focusBackground),
-    secondary = palette.secondaryVariant,
-    onSecondary = palette.onSecondaryVariant,
-    background = if (amoled) Color.Black else palette.background,
-    onBackground = Color(0xFFF5F7F8),
-    surface = palette.backgroundElevated,
-    onSurface = Color(0xFFF5F7F8),
-    surfaceVariant = palette.backgroundCard,
-    onSurfaceVariant = Color(0xFF969CA3),
-    outline = Color(0xFF252A2A),
-    error = Color(0xFFE36A8A),
-    onError = Color(0xFFFCE5EC),
-)
 
 private val JetBrainsSans: FontFamily
     @Composable
@@ -188,10 +165,6 @@ private val NuvioTypeTokens: NuvioTypeScale
         ),
     )
 
-private val NuvioRippleConfiguration = RippleConfiguration(
-    color = Color.Black,
-)
-
 @Composable
 fun NuvioTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -203,8 +176,16 @@ fun NuvioTheme(
     val palette = remember(appTheme, customThemeColors) {
         ThemeColors.getColorPalette(appTheme, customThemeColors)
     }
-    val colorScheme = buildColorScheme(palette, amoled = amoled)
-    val tokens = defaultNuvioThemeTokens(palette, amoled = amoled, colorScheme = colorScheme)
+    val colorScheme = remember(palette, darkTheme, amoled) {
+        buildNuvioColorScheme(palette, darkTheme = darkTheme, amoled = amoled)
+    }
+    val tokens = remember(palette, darkTheme, amoled, colorScheme) {
+        defaultNuvioThemeTokens(palette, amoled = amoled, colorScheme = colorScheme, darkTheme = darkTheme)
+    }
+    // Accent-tinted ripple that stays visible on both light and dark surfaces.
+    val rippleConfiguration = remember(colorScheme) {
+        RippleConfiguration(color = lerp(colorScheme.onSurface, colorScheme.primary, 0.6f))
+    }
 
     val density = LocalDensity.current
     CompositionLocalProvider(
@@ -214,7 +195,7 @@ fun NuvioTheme(
         ),
         LocalNuvioThemeTokens provides tokens,
         LocalNuvioTypeScale provides NuvioTypeTokens,
-        LocalRippleConfiguration provides NuvioRippleConfiguration,
+        LocalRippleConfiguration provides rippleConfiguration,
         LocalAppTheme provides appTheme,
         LocalThemePalette provides palette,
     ) {

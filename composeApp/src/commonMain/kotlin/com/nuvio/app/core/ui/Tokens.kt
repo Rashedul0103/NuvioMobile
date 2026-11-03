@@ -9,8 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -202,6 +205,7 @@ data class NuvioColorTokens(
     val accent: Color,
     val accentStrong: Color,
     val onAccent: Color,
+    val accentGradient: List<Color>,
     val focusRing: Color,
     val focusBackground: Color,
     val borderSubtle: Color,
@@ -229,6 +233,11 @@ data class NuvioColorTokens(
     val playerBuffering: Color,
     val parentalGuide: Color,
 )
+
+/** Light-aware equivalent of [ThemeColorPalette.accentBrush]. */
+fun NuvioColorTokens.accentBrush(): Brush =
+    if (accentGradient.size >= 2) Brush.linearGradient(accentGradient)
+    else SolidColor(accentGradient.firstOrNull() ?: accent)
 
 @Immutable
 data class NuvioShapeTokens(
@@ -357,7 +366,7 @@ data class NuvioThemeTokens(
 )
 
 internal val LocalNuvioThemeTokens = staticCompositionLocalOf {
-    defaultNuvioThemeTokens(ThemeColors.White, amoled = false, colorScheme = null)
+    defaultNuvioThemeTokens(ThemeColors.White, amoled = false, colorScheme = null, darkTheme = true)
 }
 
 val MaterialTheme.nuvio: NuvioThemeTokens
@@ -369,18 +378,32 @@ internal fun defaultNuvioThemeTokens(
     palette: ThemeColorPalette,
     amoled: Boolean,
     colorScheme: ColorScheme?,
+    darkTheme: Boolean = true,
 ): NuvioThemeTokens {
-    val background = if (amoled) Color.Black else palette.background
-    val textPrimary = Color(0xFFF5F7F8)
-    val textSecondary = Color(0xFFB8BEC5)
-    val textMuted = Color(0xFF969CA3)
-    val surface = palette.backgroundElevated
-    val surfaceCard = palette.backgroundCard
-    val accent = palette.secondary
-    val accentStrong = palette.secondaryVariant
-    val borderSubtle = Color(0xFF252A2A).copy(alpha = 0.55f)
-    val borderDefault = Color(0xFF252A2A)
+    // General UI tokens derive from the active Material scheme so they follow light/dark,
+    // AMOLED and the selected accent. Player tokens below stay intentionally cinematic.
+    val scheme = colorScheme ?: buildNuvioColorScheme(palette, darkTheme = darkTheme, amoled = amoled)
+    val background = scheme.background
+    val surface = scheme.surface
+    val surfaceCard = scheme.surfaceVariant
+    val textPrimary = scheme.onSurface
+    val textSecondary = lerp(scheme.onSurface, scheme.onSurfaceVariant, 0.7f)
+    val textMuted = scheme.onSurfaceVariant
+    val accent = scheme.primary
+    val accentStrong = scheme.secondary
+    val focusRing = if (darkTheme) palette.focusRing else darkenUntilContrast(palette.focusRing, background, 3f)
+    // Dark keeps the app's established neutral borders; light uses the M3 outline roles.
+    val borderDefault = if (darkTheme) Color(0xFF252A2A) else scheme.outlineVariant
+    val borderStrong = if (darkTheme) Color(0xFF3A4040) else scheme.outline
+    // Pale accent gradients (Gold, Graphite, White...) vanish on light surfaces, so deepen them there.
+    val accentGradient = if (darkTheme) {
+        palette.accentGradient
+    } else {
+        palette.accentGradient.map { darkenUntilContrast(it, background, 3f) }
+    }
     val overlayScrim = Color.Black.copy(alpha = NuvioTokens.Opacity.overlayMedium)
+    // Player surfaces are always dark, so they keep the dark-mode accent regardless of app mode.
+    val playerAccent = palette.secondary
 
     return NuvioThemeTokens(
         colors = NuvioColorTokens(
@@ -397,35 +420,36 @@ internal fun defaultNuvioThemeTokens(
             textSecondary = textSecondary,
             textMuted = textMuted,
             textDisabled = textMuted.copy(alpha = NuvioTokens.Opacity.disabled),
-            textInverse = Color(0xFF111111),
+            textInverse = scheme.background,
             accent = accent,
             accentStrong = accentStrong,
-            onAccent = palette.onSecondary,
-            focusRing = palette.focusRing,
-            focusBackground = palette.focusBackground,
-            borderSubtle = borderSubtle,
+            onAccent = scheme.onPrimary,
+            accentGradient = accentGradient,
+            focusRing = focusRing,
+            focusBackground = scheme.primaryContainer,
+            borderSubtle = borderDefault.copy(alpha = 0.55f),
             borderDefault = borderDefault,
-            borderStrong = Color(0xFF3A4040),
-            borderFocus = palette.focusRing,
+            borderStrong = borderStrong,
+            borderFocus = focusRing,
             borderSelected = accent.copy(alpha = NuvioTokens.Opacity.strong),
-            success = Color(0xFF66BB6A),
-            warning = Color(0xFFFFC857),
-            danger = colorScheme?.error ?: Color(0xFFE36A8A),
-            info = Color(0xFF42A5F5),
+            success = if (darkTheme) Color(0xFF66BB6A) else Color(0xFF2E7D32),
+            warning = if (darkTheme) Color(0xFFFFC857) else Color(0xFF8A5A00),
+            danger = scheme.error,
+            info = if (darkTheme) Color(0xFF42A5F5) else Color(0xFF1565C0),
             neutral = textMuted,
             overlayScrim = overlayScrim,
-            overlayHover = Color.White.copy(alpha = NuvioTokens.Opacity.hover),
-            overlayPressed = Color.White.copy(alpha = NuvioTokens.Opacity.pressed),
-            overlaySelected = Color.White.copy(alpha = NuvioTokens.Opacity.selected),
-            overlayDisabled = Color.Black.copy(alpha = NuvioTokens.Opacity.disabled),
-            shimmer = Color.White.copy(alpha = 0.10f),
-            skeleton = Color.White.copy(alpha = 0.06f),
+            overlayHover = scheme.onSurface.copy(alpha = NuvioTokens.Opacity.hover),
+            overlayPressed = scheme.onSurface.copy(alpha = NuvioTokens.Opacity.pressed),
+            overlaySelected = scheme.onSurface.copy(alpha = NuvioTokens.Opacity.selected),
+            overlayDisabled = scheme.background.copy(alpha = NuvioTokens.Opacity.disabled),
+            shimmer = scheme.onSurface.copy(alpha = 0.10f),
+            skeleton = scheme.onSurface.copy(alpha = 0.06f),
             playerControlsBackground = Color.Black.copy(alpha = 0.72f),
             playerControlsForeground = Color.White,
             playerTimelineTrack = Color.White.copy(alpha = 0.30f),
-            playerTimelineFill = accent,
+            playerTimelineFill = playerAccent,
             playerSubtitlePreview = Color.Black.copy(alpha = 0.55f),
-            playerBuffering = accent,
+            playerBuffering = playerAccent,
             parentalGuide = Color(0xFF5D1F1F),
         ),
         spacing = NuvioSpacingTokens(

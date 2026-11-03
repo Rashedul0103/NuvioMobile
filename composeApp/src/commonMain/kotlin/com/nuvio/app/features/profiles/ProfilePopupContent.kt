@@ -48,6 +48,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -102,6 +103,12 @@ internal fun ProfilePopupContent(
             },
             contentAlignment = panelAlignment,
         ) {
+            // Neutral surface that follows light/dark (≈ #1C1C1E in dark).
+            val popupSurface = lerp(
+                MaterialTheme.colorScheme.background,
+                MaterialTheme.colorScheme.onSurface,
+                0.08f,
+            )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,9 +119,9 @@ internal fun ProfilePopupContent(
                         if (hazeState != null) {
                             Modifier.hazeEffect(hazeState) {
                                 blurRadius = 24.dp
-                                backgroundColor = Color(0xFF1C1C1E)
-                                tints = listOf(HazeTint(Color(0xFF1C1C1E).copy(alpha = 0.55f)))
-                                fallbackTint = HazeTint(Color(0xFF1C1C1E).copy(alpha = 0.94f))
+                                backgroundColor = popupSurface
+                                tints = listOf(HazeTint(popupSurface.copy(alpha = 0.55f)))
+                                fallbackTint = HazeTint(popupSurface.copy(alpha = 0.94f))
                                 noiseFactor = 0f
                             }
                         } else {
